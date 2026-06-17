@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@layer base {
+  @font-face {
+    font-family: "Vazir";
+    src: url(../../public/fonts/vazir.ttf);
+  }
+  @font-face {
+    font-family: "VazirBold";
+    src: url(../../public/fonts/vazir-bold.ttf);
+  }
+}
+
+root,
+html,
+body {
+  direction: rtl;
+  padding: 0;
+  margin: 0;
+  font-family: Vazir;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
