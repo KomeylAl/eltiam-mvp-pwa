@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getUserSetupData, UserSetupData } from "@/contexts/FormContext";
 import { useUser } from "@/contexts/UserContext";
 import { insertSafetyPlan } from "@/lib/dbActions";
+import { formatLocalDate, formatLocalTime } from "@/utils/converts";
 
 interface ThirdFormProps {
   onSuccess: () => void;
@@ -41,9 +42,10 @@ const ThirdForm: React.FC<ThirdFormProps> = ({ onSuccess }) => {
 
   const onSubmit = async () => {
     try {
+      const now = new Date();
       await insertSafetyPlan({
-        date: new Date().toISOString().slice(0, 10),
-        time: `${new Date().getHours()}:${new Date().getMinutes()}`,
+        date: formatLocalDate(now),
+        time: formatLocalTime(now),
         user_id: user?.id ?? 0,
         user_name: user?.name ?? "",
         question_one: isSelected ? 1 : 0,

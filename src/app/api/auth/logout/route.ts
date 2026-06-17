@@ -1,21 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const token = req.cookies.get("token");
   try {
-    const res = NextResponse.json(
-      { message: "Logged out successfuly" },
-      { status: 200 }
-    );
+    const token = req.cookies.get("token")?.value;
 
+    if (token) {
+      await fetch(`${process.env.BACKEND_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+
+    const res = NextResponse.json({ message: "Logged out successfully." });
     res.cookies.delete("token");
-    res.cookies.delete("role");
-
     return res;
-  } catch (error: any) {
-    console.log(error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { message: `Something went wrong ${error.message}` },
+      { message: `Something went wrong: ${message}` },
       { status: 500 }
     );
   }

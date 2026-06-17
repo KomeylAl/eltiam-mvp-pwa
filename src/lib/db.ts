@@ -72,6 +72,14 @@ export class AppDatabase extends Dexie {
       social_problem: "++id, user_id, synced",
       safety_plan: "++id, user_id, synced",
     });
+
+    this.version(2).stores({
+      measurements: "++id, user_id, synced, date",
+      interventions: "++id, user_id, synced, date",
+      word_game: "++id, user_id, synced, date",
+      social_problem: "++id, user_id, synced, date",
+      safety_plan: "++id, user_id, synced, date",
+    });
   }
 }
 

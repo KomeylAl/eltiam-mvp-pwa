@@ -17,9 +17,10 @@ const CallModal: React.FC<CallModalProps> = ({ isVisible, onClose }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-11/12 max-w-md text-center space-y-5">
-        <p className="text-lg font-vazir">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md text-center space-y-5 animate-fade-in">
+        <span className="text-4xl block">💚</span>
+        <p className="text-base font-vazir text-gray-700 leading-relaxed">
           تو تنها نیستی؛ افرادی هستند که به تو اهمیت می‌دهند و می‌خواهند کمکت
           کنند. اگر نیاز به صحبت داری، همین حالا تماس بگیر:
         </p>
@@ -27,21 +28,21 @@ const CallModal: React.FC<CallModalProps> = ({ isVisible, onClose }) => {
         <div className="space-y-3">
           <button
             onClick={() => callPhoneNumber("123")}
-            className="w-full p-4 bg-blue-500 hover:bg-blue-600 text-white text-lg rounded-lg font-vazir transition"
+            className="w-full p-4 btn-primary text-lg font-vazir-bold"
           >
-            123
+            📞 123
           </button>
 
           <button
             onClick={() => callPhoneNumber("1480")}
-            className="w-full p-4 bg-blue-500 hover:bg-blue-600 text-white text-lg rounded-lg font-vazir transition"
+            className="w-full p-4 btn-primary text-lg font-vazir-bold"
           >
-            1480
+            📞 1480
           </button>
 
           <button
             onClick={onClose}
-            className="w-full p-3 bg-amber-500 hover:bg-amber-600 text-white text-lg rounded-lg font-vazir mt-3 transition"
+            className="w-full p-3 text-gray-500 font-vazir text-base mt-1"
           >
             بستن
           </button>

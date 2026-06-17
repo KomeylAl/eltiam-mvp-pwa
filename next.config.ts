@@ -5,20 +5,15 @@ const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === "development", // در dev mode غیرفعاله
+  disable: process.env.NODE_ENV === "development",
+  customWorkerDir: "worker",
   fallback: {
     document: "/offline",
   },
 });
 
-module.exports = withPWA({
-  reactStrictMode: true,
-  experimental: {
-    appDir: true,
-  },
-});
-
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
   turbopack: {
     root: path.join(__dirname, ".."),
     resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json"],
@@ -31,4 +26,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

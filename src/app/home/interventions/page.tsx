@@ -27,7 +27,6 @@ const Intervention = () => {
     ).padStart(2, "0")}`;
     setSelectedDate(todayJalali);
 
-    // اسکرول به تاریخ امروز
     setTimeout(() => {
       const el = document.getElementById(`date-${todayJalali}`);
       el?.scrollIntoView({ behavior: "smooth", inline: "center" });
@@ -35,37 +34,42 @@ const Intervention = () => {
   }, []);
 
   return (
-    <div className="bg-white text-black min-h-screen overflow-y-auto">
-      {/* هدر سبز بالای صفحه */}
-      <div className="w-full bg-[#469173] flex flex-col items-center justify-center py-12">
-        <h1 className="text-3xl text-white font-bold mb-4">مداخله</h1>
+    <div className="bg-gray-50 min-h-screen pb-24 animate-fade-in">
+      <div className="page-header flex flex-col items-center py-8 px-4">
+        <span className="text-2xl mb-1">🤝</span>
+        <h1 className="text-2xl text-white font-vazir-bold">مداخله</h1>
+        <p className="text-white/70 text-xs font-vazir mt-1">
+          پاسخ به سوالات مداخله‌ای
+        </p>
 
-        {/* نوار اسکرولی تاریخ‌ها */}
-        <div
+        {/* <div
           ref={listRef}
-          className="flex flex-row-reverse overflow-x-auto w-full px-4 mt-4 no-scrollbar"
+          className="flex flex-row-reverse overflow-x-auto w-full px-2 mt-5 no-scrollbar"
         >
           {dates.map((item) => (
-            <div
+            <button
               key={item.date}
               id={`date-${item.date}`}
-              className={`rounded-lg border mx-2 px-4 py-2 text-sm whitespace-nowrap transition-colors ${
+              onClick={() => setSelectedDate(item.date)}
+              className={`rounded-full mx-1.5 px-4 py-1.5 text-xs whitespace-nowrap transition-all font-vazir ${
                 item.date === selectedDate
-                  ? "bg-white text-[#469173] border-white"
-                  : "bg-transparent text-white border-white hover:bg-white/10"
+                  ? "bg-white text-primary shadow-md scale-105"
+                  : "bg-white/15 text-white border border-white/30"
               }`}
             >
               {item.date}
-            </div>
+            </button>
           ))}
-        </div>
+        </div> */}
       </div>
 
-      {/* فرم روز انتخاب‌شده */}
-      <div className="px-6 mt-8">
-        <h2 className="font-vazir text-black text-xl text-center mb-4">
-          فرم روز: {date}
-        </h2>
+      <div className="px-4 mt-4">
+        <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-100 mb-4">
+          <p className="font-vazir text-gray-600 text-sm text-center">
+            فرم روز:{" "}
+            <span className="text-primary font-vazir-bold">{date}</span>
+          </p>
+        </div>
         <InterventionForm questions={questions} />
       </div>
     </div>

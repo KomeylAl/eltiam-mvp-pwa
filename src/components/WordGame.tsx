@@ -5,6 +5,7 @@ import Confetti from "react-confetti";
 import "react-toastify/dist/ReactToastify.css";
 import { insertWordGame } from "@/lib/dbActions";
 import { useUser } from "@/contexts/UserContext";
+import { formatLocalDate, formatLocalTime } from "@/utils/converts";
 import toast from "react-hot-toast";
 
 interface Word {
@@ -110,9 +111,10 @@ const PositiveWordGame: React.FC<PositiveWordGameProps> = ({ onFinish }) => {
     }
 
     try {
+      const now = new Date();
       await insertWordGame({
-        date: new Date().toISOString().slice(0, 10),
-        time: `${new Date().getHours()}:${new Date().getMinutes()}`,
+        date: formatLocalDate(now),
+        time: formatLocalTime(now),
         user_id: user?.id ?? 0,
         user_name: user?.name ?? "",
         point: finalScore,

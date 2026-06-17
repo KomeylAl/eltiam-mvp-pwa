@@ -8,39 +8,33 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({ phone, password }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const data = await response.json();
-      console.log(data);
       return NextResponse.json(
-        { message: "Invalid credentials" },
+        { message: data.message || "Invalid credentials" },
         { status: response.status }
       );
     }
 
-    const data = await response.json();
-    console.log(data);
-
-    const cookies = [
-      `token=${data.access_token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24};`,
-      `refreshToken=${data.refresh_token}; HttpOnly; Path=/; Max-Age=${
-        60 * 60 * 24 * 30
-      };`,
-    ].join(", ");
-
-    const headers = new Headers();
-    headers.append("Set-Cookie", cookies);
-
-    return new NextResponse(JSON.stringify(data.user), {
-      headers,
+    const res = NextResponse.json(data.user);
+    res.cookies.set("token", data.token, {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "lax",
     });
-  } catch (error: any) {
-    console.log(error);
+
+    return res;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { message: `Something went wrong ${error.message}` },
+      { message: `Something went wrong: ${message}` },
       { status: 500 }
     );
   }

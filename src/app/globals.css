@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #469173;
+  --color-primary-light: #5ba88a;
+  --color-primary-dark: #357a5e;
+  --color-primary-soft: #e8f5ef;
+  --color-accent: #2d6a4f;
+  --font-vazir: "Vazir", sans-serif;
+  --font-vazir-bold: "VazirBold", sans-serif;
+}
+
 @layer base {
   @font-face {
     font-family: "Vazir";
@@ -11,20 +21,99 @@
   }
 }
 
-root,
+:root,
 html,
 body {
   direction: rtl;
   padding: 0;
   margin: 0;
-  font-family: Vazir;
+  font-family: Vazir, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-vazir {
+  font-family: Vazir, sans-serif;
+}
+
+.font-vazir-bold {
+  font-family: VazirBold, sans-serif;
+}
+
+.page-header {
+  background: linear-gradient(135deg, #357a5e 0%, #469173 50%, #5ba88a 100%);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.settings-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(70, 145, 115, 0.08);
+  transition: all 0.2s ease;
+}
+
+.settings-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(70, 145, 115, 0.12);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #469173, #5ba88a);
+  color: white;
+  border-radius: 0.75rem;
+  font-family: VazirBold, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #357a5e, #469173);
+  box-shadow: 0 4px 12px rgba(70, 145, 115, 0.35);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: white;
+  color: #469173;
+  border: 2px solid #469173;
+  border-radius: 0.75rem;
+  font-family: VazirBold, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: #469173;
+  color: white;
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-/* Hide scrollbar for IE, Edge and Firefox */
+
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
 }

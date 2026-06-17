@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { insertSocialProblem } from "@/lib/dbActions";
 import { useUser } from "@/contexts/UserContext";
+import { formatLocalDate, formatLocalTime } from "@/utils/converts";
 
 interface StepFormProps {
   onSubmit: () => void;
@@ -82,9 +83,10 @@ const StepForm: React.FC<StepFormProps> = ({ onSubmit }) => {
       .join(", ");
 
     try {
+      const now = new Date();
       await insertSocialProblem({
-        date: new Date().toISOString().slice(0, 10),
-        time: `${new Date().getHours()}:${new Date().getMinutes()}`,
+        date: formatLocalDate(now),
+        time: formatLocalTime(now),
         user_id: user?.id ?? 0,
         user_name: user?.name ?? "",
         problem: problem,

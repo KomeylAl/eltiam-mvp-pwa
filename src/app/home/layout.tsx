@@ -1,5 +1,6 @@
 import "../globals.css";
 import BottomNav from "@/components/BottomNav";
+import FormRemindersProvider from "@/components/FormRemindersProvider";
 
 export default function ApplicationLayout({
   children,
@@ -7,9 +8,11 @@ export default function ApplicationLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      {children}
-      <BottomNav />
-    </div>
+    <FormRemindersProvider>
+      <div>
+        {children}
+        <BottomNav />
+      </div>
+    </FormRemindersProvider>
   );
 }

@@ -1,5 +1,5 @@
 import { useUser } from "@/contexts/UserContext";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -7,26 +7,24 @@ export function useLogin() {
   const router = useRouter();
   const { setUser } = useUser();
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: { phone: string; password: string }) => {
       const res = await fetch("/api/auth/login", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      const result = await res.json();
       if (!res.ok) {
-        if (res.status === 401) {
-          throw new Error("نام کاربری یا رمز عبور اشتباه است.!");
-        }
-        throw new Error("خطا در ارسال اطلاعات!");
+        throw new Error(result.message || "نام کاربری یا رمز عبور اشتباه است.");
       }
-      return await res.json();
+      return result;
     },
     onError(error) {
       toast.error(error.message);
-      console.log(error);
     },
     onSuccess: (result) => {
       setUser(result);
-      toast.success("با موفقیت وارد شدید. لطفا کمی صبر کنید.");
+      toast.success("با موفقیت وارد شدید.");
       router.replace("/home/measurements");
     },
   });
