@@ -9,17 +9,19 @@ export type ActivationSlot = {
 export type FormType = "measurement" | "intervention";
 
 export const MEASUREMENT_SLOTS: ActivationSlot[] = [
-  { start: 8, end: 10, label: "۸:۰۰ تا ۱۰:۰۰" },
-  { start: 10, end: 12, label: "۱۰:۰۰ تا ۱۳:۰۰" },
-  { start: 12, end: 14, label: "۱۲:۰۰ تا ۱۴:۰۰" },
-  { start: 14, end: 16, label: "۱۴:۰۰ تا ۱۶:۰۰" },
+  { start: 8, end: 11, label: "۸:۰۰ تا ۱۱:۰۰" },
+  { start: 12, end: 13, label: "۱۲:۰۰ تا ۱۳:۰۰" },
+  { start: 14, end: 15, label: "۱۴:۰۰ تا ۱۵:۰۰" },
+  { start: 16, end: 24, label: "۱۶:۰۰ تا ۱۸:۰۰" },
+  { start: 16, end: 24, label: "۱۶:۰۰ تا ۱۸:۰۰" },
 ];
 
 export const INTERVENTION_SLOTS: ActivationSlot[] = [
-  { start: 8, end: 10, label: "۸:۰۰ تا ۱۰:۰۰" },
-  { start: 10, end: 12, label: "۱۰:۰۰ تا ۱۳:۰۰" },
-  { start: 12, end: 14, label: "۱۲:۰۰ تا ۱۴:۰۰" },
-  { start: 14, end: 16, label: "۱۴:۰۰ تا ۱۶:۰۰" },
+  { start: 8, end: 11, label: "۸:۰۰ تا ۱۱:۰۰" },
+  { start: 12, end: 13, label: "۱۲:۰۰ تا ۱۳:۰۰" },
+  { start: 14, end: 15, label: "۱۴:۰۰ تا ۱۵:۰۰" },
+  { start: 17, end: 24, label: "۱۷:۰۰ تا ۱۸:۰۰" },
+  { start: 17, end: 24, label: "۱۷:۰۰ تا ۱۸:۰۰" },
 ];
 
 export const FORM_REMINDERS_ENABLED_KEY = "form_reminders_enabled";

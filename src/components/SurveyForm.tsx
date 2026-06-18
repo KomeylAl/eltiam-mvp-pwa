@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { formatLocalDate, formatLocalTime } from "@/utils/converts";
-import {
-  insertMeasurementsBatch,
-  isMeasurementSlotSubmitted,
-  syncWithServer,
-} from "@/lib/dbActions";
+import { insertMeasurementsBatch, syncWithServer } from "@/lib/dbActions";
 import { onFormAnswerSubmitted } from "@/lib/notifications";
 import { useUser } from "@/contexts/UserContext";
 import { MEASUREMENT_SLOTS } from "@/utils/schedule";
@@ -22,9 +18,6 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
   const [slotAnswers, setSlotAnswers] = useState<
     Record<number, Record<number, number>>
   >({});
-  const [submittedSlots, setSubmittedSlots] = useState<Record<number, boolean>>(
-    {}
-  );
   const [submittingSlot, setSubmittingSlot] = useState<number | null>(null);
   const [currentHour, setCurrentHour] = useState<number>(new Date().getHours());
   const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>(
@@ -40,27 +33,15 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const loadSubmitted = async () => {
-      const date = formatLocalDate();
-      const statuses: Record<number, boolean> = {};
-      for (let i = 0; i < MEASUREMENT_SLOTS.length; i++) {
-        statuses[i] = await isMeasurementSlotSubmitted(
-          MEASUREMENT_SLOTS[i],
-          date
-        );
-      }
-      setSubmittedSlots(statuses);
-    };
-    loadSubmitted();
-  }, [currentHour]);
-
   const handleSelect = (
     slotIdx: number,
     questionIndex: number,
     optionIndex: number
   ) => {
-    if (submittedSlots[slotIdx]) return;
+    if (optionIndex >= 3) {
+      setShowCallModal(true);
+    }
+
     setSlotAnswers((prev) => ({
       ...prev,
       [slotIdx]: { ...prev[slotIdx], [questionIndex]: optionIndex },
@@ -73,11 +54,6 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
 
     if (!allAnswered) {
       toast.error("لطفاً به هر ۳ سؤال پاسخ دهید.");
-      return;
-    }
-
-    if (submittedSlots[slotIdx]) {
-      toast("این پرسشنامه قبلاً ثبت شده است.", { icon: "✓" });
       return;
     }
 
@@ -97,13 +73,11 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
 
     try {
       await insertMeasurementsBatch(records);
-      setSubmittedSlots((prev) => ({ ...prev, [slotIdx]: true }));
 
       const result = await syncWithServer({ silent: true });
       await onFormAnswerSubmitted("measurement");
 
-      const hasHighRisk = Object.values(answers).some((a) => a >= 3);
-      if (hasHighRisk) setShowCallModal(true);
+      setSlotAnswers((prev) => ({ ...prev, [slotIdx]: {} }));
 
       if (result.skippedOffline) {
         toast.success("پاسخ‌ها ذخیره شد. با اتصال اینترنت ارسال می‌شود.");
@@ -128,7 +102,6 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
         const isActive = currentHour >= hour.start && currentHour < hour.end;
         const isExpanded = expandedBlocks[idx];
         const answers = slotAnswers[idx] ?? {};
-        const isSubmitted = submittedSlots[idx];
         const isSubmitting = submittingSlot === idx;
         const allAnswered = questions.every((_, i) => answers[i] !== undefined);
 
@@ -152,11 +125,8 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
                   : "bg-gray-300 cursor-not-allowed"
               }`}
             >
-              <span>{isSubmitted ? "✓" : "⏰"}</span>
+              <span>⏰</span>
               سوالات ساعت {hour.start}:00
-              {isSubmitted && (
-                <span className="text-xs opacity-80">(ثبت شده)</span>
-              )}
             </button>
 
             {isActive && isExpanded && (
@@ -170,13 +140,12 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
                       {options.map((option, oIdx) => (
                         <button
                           key={oIdx}
-                          disabled={isSubmitted}
                           onClick={() => handleSelect(idx, qIdx, oIdx)}
                           className={`py-2.5 rounded-xl border transition-all font-vazir text-sm ${
                             answers[qIdx] === oIdx
                               ? "bg-primary text-white border-primary shadow-sm"
                               : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary/40"
-                          } ${isSubmitted ? "opacity-60 cursor-not-allowed" : ""}`}
+                          }`}
                         >
                           {option}
                         </button>
@@ -187,20 +156,14 @@ const SurveyForm: React.FC<SurveyFormProps> = ({ questions }) => {
 
                 <button
                   onClick={() => handleSubmit(idx)}
-                  disabled={isSubmitted || isSubmitting || !allAnswered}
+                  disabled={isSubmitting || !allAnswered}
                   className={`w-full py-3.5 rounded-xl font-vazir-bold text-base transition-all ${
-                    isSubmitted
-                      ? "bg-primary-soft text-primary cursor-default"
-                      : allAnswered
-                        ? "btn-primary"
-                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    allAnswered && !isSubmitting
+                      ? "btn-primary"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {isSubmitted
-                    ? "✓ ثبت شده"
-                    : isSubmitting
-                      ? "در حال ثبت و ارسال..."
-                      : "ثبت پاسخ‌ها"}
+                  {isSubmitting ? "در حال ثبت و ارسال..." : "ثبت پاسخ‌ها"}
                 </button>
               </div>
             )}

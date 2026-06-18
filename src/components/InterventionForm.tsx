@@ -6,11 +6,7 @@ import StepForm from "./StepForm";
 import PositiveWordGame from "./WordGame";
 import ThirdForm from "./ThirdForm";
 import { formatLocalDate, formatLocalTime } from "@/utils/converts";
-import {
-  insertInterventionsBatch,
-  isInterventionSlotSubmitted,
-  syncWithServer,
-} from "@/lib/dbActions";
+import { insertInterventionsBatch, syncWithServer } from "@/lib/dbActions";
 import { onFormAnswerSubmitted } from "@/lib/notifications";
 import { useUser } from "@/contexts/UserContext";
 import { INTERVENTION_SLOTS } from "@/utils/schedule";
@@ -27,9 +23,6 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
   const [slotAnswers, setSlotAnswers] = useState<
     Record<number, Record<number, number>>
   >({});
-  const [submittedSlots, setSubmittedSlots] = useState<Record<number, boolean>>(
-    {}
-  );
   const [submittingSlot, setSubmittingSlot] = useState<number | null>(null);
   const [currentHour, setCurrentHour] = useState<number>(new Date().getHours());
   const [expandedBlocks, setExpandedBlocks] = useState<Record<number, boolean>>(
@@ -47,27 +40,17 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const loadSubmitted = async () => {
-      const date = formatLocalDate();
-      const statuses: Record<number, boolean> = {};
-      for (let i = 0; i < INTERVENTION_SLOTS.length; i++) {
-        statuses[i] = await isInterventionSlotSubmitted(
-          INTERVENTION_SLOTS[i],
-          date
-        );
-      }
-      setSubmittedSlots(statuses);
-    };
-    loadSubmitted();
-  }, [currentHour]);
-
   const handleSelect = (
     slotIdx: number,
     questionIndex: number,
     optionIndex: number
   ) => {
-    if (submittedSlots[slotIdx]) return;
+    if (optionIndex >= 3) {
+      if (questionIndex === 0) setIsVisible(true);
+      if (questionIndex === 1) setIsGameVisible(true);
+      if (questionIndex === 2) setIsThirdVisible(true);
+    }
+
     setSlotAnswers((prev) => ({
       ...prev,
       [slotIdx]: { ...prev[slotIdx], [questionIndex]: optionIndex },
@@ -80,11 +63,6 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
 
     if (!allAnswered) {
       toast.error("لطفاً به هر ۳ سؤال پاسخ دهید.");
-      return;
-    }
-
-    if (submittedSlots[slotIdx]) {
-      toast("این پرسشنامه قبلاً ثبت شده است.", { icon: "✓" });
       return;
     }
 
@@ -104,14 +82,11 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
 
     try {
       await insertInterventionsBatch(records);
-      setSubmittedSlots((prev) => ({ ...prev, [slotIdx]: true }));
 
       const result = await syncWithServer({ silent: true });
       await onFormAnswerSubmitted("intervention");
 
-      if (answers[0] >= 3) setIsVisible(true);
-      if (answers[1] >= 3) setIsGameVisible(true);
-      if (answers[2] >= 3) setIsThirdVisible(true);
+      setSlotAnswers((prev) => ({ ...prev, [slotIdx]: {} }));
 
       if (result.skippedOffline) {
         toast.success("پاسخ‌ها ذخیره شد. با اتصال اینترنت ارسال می‌شود.");
@@ -139,7 +114,6 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
         const isActive = currentHour < hour.end && currentHour >= hour.start;
         const isExpanded = expandedBlocks[groupIdx];
         const answers = slotAnswers[groupIdx] ?? {};
-        const isSubmitted = submittedSlots[groupIdx];
         const isSubmitting = submittingSlot === groupIdx;
         const allAnswered = questions.every((_, i) => answers[i] !== undefined);
 
@@ -163,11 +137,8 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
                   : "bg-gray-300 cursor-not-allowed"
               }`}
             >
-              <span>{isSubmitted ? "✓" : "⏰"}</span>
+              <span>⏰</span>
               سوالات ساعت {hour.start}:00
-              {isSubmitted && (
-                <span className="text-xs opacity-80">(ثبت شده)</span>
-              )}
             </button>
 
             {isActive && isExpanded && (
@@ -181,13 +152,12 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
                       {options.map((option, oIdx) => (
                         <button
                           key={oIdx}
-                          disabled={isSubmitted}
                           onClick={() => handleSelect(groupIdx, qIdx, oIdx)}
                           className={`py-2.5 rounded-xl border transition-all font-vazir text-sm ${
                             answers[qIdx] === oIdx
                               ? "bg-primary text-white border-primary shadow-sm"
                               : "bg-gray-50 text-gray-700 border-gray-200 hover:border-primary/40"
-                          } ${isSubmitted ? "opacity-60 cursor-not-allowed" : ""}`}
+                          }`}
                         >
                           {option}
                         </button>
@@ -198,20 +168,14 @@ const InterventionForm: React.FC<InterventionFormProps> = ({ questions }) => {
 
                 <button
                   onClick={() => handleSubmit(groupIdx)}
-                  disabled={isSubmitted || isSubmitting || !allAnswered}
+                  disabled={isSubmitting || !allAnswered}
                   className={`w-full py-3.5 rounded-xl font-vazir-bold text-base transition-all ${
-                    isSubmitted
-                      ? "bg-primary-soft text-primary cursor-default"
-                      : allAnswered
-                        ? "btn-primary"
-                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    allAnswered && !isSubmitting
+                      ? "btn-primary"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {isSubmitted
-                    ? "✓ ثبت شده"
-                    : isSubmitting
-                      ? "در حال ثبت و ارسال..."
-                      : "ثبت پاسخ‌ها"}
+                  {isSubmitting ? "در حال ثبت و ارسال..." : "ثبت پاسخ‌ها"}
                 </button>
               </div>
             )}
