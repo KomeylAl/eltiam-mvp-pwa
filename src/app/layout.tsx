@@ -22,6 +22,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#469173" />
       </head>
       <body className="relative bg-gray-50">
+        <script>
+          window.NAJVA={};var
+          s=document.createElement("script");s.src="https://van.najva.com/static/js/main-script.js";s.defer=!0;s.id="najva-mini-script";s.setAttribute("data-najva-id","20361b33-4c25-4731-920d-c629ac0f02d4");document.head.appendChild(s);
+        </script>
         <Toaster
           position="bottom-center"
           toastOptions={{
