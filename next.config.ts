@@ -7,8 +7,8 @@ const withPWA = require("next-pwa")({
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
   customWorkerDir: "worker",
-  fallback: {
-    document: "/offline",
+  fallbacks: {
+    document: "/home/offline",
   },
 });
 
