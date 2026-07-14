@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { clearRegisteredDevice } from "@/lib/firebase/device-storage";
 
 type User = {
   id: number;
@@ -68,6 +69,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await axios.post("/api/auth/logout");
+      clearRegisteredDevice();
       setUser(null);
       router.replace("/auth/login");
     } catch {

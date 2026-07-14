@@ -14,8 +14,9 @@ const withPWA = require("next-pwa")({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   turbopack: {
-    root: path.join(__dirname, ".."),
+    root: path.join(__dirname),
     resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json"],
   },
   typescript: {
