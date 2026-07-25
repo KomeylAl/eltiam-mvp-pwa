@@ -7,15 +7,16 @@ const withPWA = require("next-pwa")({
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
   customWorkerDir: "worker",
-  fallback: {
-    document: "/offline",
+  fallbacks: {
+    document: "/home/offline",
   },
 });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   turbopack: {
-    root: path.join(__dirname, ".."),
+    root: path.join(__dirname),
     resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json"],
   },
   typescript: {
