@@ -27,7 +27,7 @@ export async function POST(
   try {
     const body = await req.json();
 
-    const response = await fetch(`${process.env.BACKEND_URL}${endpoint}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

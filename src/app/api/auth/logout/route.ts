@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     const token = req.cookies.get("token")?.value;
 
     if (token) {
-      await fetch(`${process.env.BACKEND_URL}/auth/logout`, {
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {
         method: "POST",
         headers: {
           Accept: "application/json",

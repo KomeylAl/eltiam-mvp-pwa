@@ -1,6 +1,7 @@
 import "../globals.css";
 import BottomNav from "@/components/BottomNav";
 import FormRemindersProvider from "@/components/FormRemindersProvider";
+import PushNotificationProvider from "@/components/PushNotificationProvider";
 
 export default function ApplicationLayout({
   children,
@@ -9,10 +10,12 @@ export default function ApplicationLayout({
 }>) {
   return (
     <FormRemindersProvider>
-      <div>
-        {children}
-        <BottomNav />
-      </div>
+      <PushNotificationProvider>
+        <div>
+          {children}
+          <BottomNav />
+        </div>
+      </PushNotificationProvider>
     </FormRemindersProvider>
   );
 }

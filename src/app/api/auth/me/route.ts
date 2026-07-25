@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/me`, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
