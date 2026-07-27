@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl, serverFetch } from "@/lib/serverFetch";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function POST(req: NextRequest) {
   try {
     const { phone, password } = await req.json();
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
+    const response = await serverFetch(`${getBackendUrl()}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,7 +17,11 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ phone, password }),
     });
 
-    const data = await response.json();
+    const data = await response.json<{
+      message?: string;
+      user?: unknown;
+      token?: string;
+    }>();
 
     if (!response.ok) {
       return NextResponse.json(
@@ -23,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const res = NextResponse.json(data.user);
-    res.cookies.set("token", data.token, {
+    res.cookies.set("token", data.token!, {
       httpOnly: true,
       path: "/",
       maxAge: 60 * 60 * 24 * 30,

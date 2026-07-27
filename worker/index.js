@@ -5,17 +5,37 @@ const reminderTimeouts = [];
 const NOTIFICATION_DB = "eltiamNotifications";
 const NOTIFICATION_STORE = "flags";
 
+/** @type {Promise<IDBDatabase> | null} */
+let notificationDbPromise = null;
+
 function openNotificationDB() {
-  return new Promise((resolve, reject) => {
+  if (notificationDbPromise) return notificationDbPromise;
+
+  notificationDbPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(NOTIFICATION_DB, 1);
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(NOTIFICATION_STORE)) {
         req.result.createObjectStore(NOTIFICATION_STORE);
       }
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onsuccess = () => {
+      const dbConn = req.result;
+      dbConn.onclose = () => {
+        notificationDbPromise = null;
+      };
+      dbConn.onversionchange = () => {
+        dbConn.close();
+        notificationDbPromise = null;
+      };
+      resolve(dbConn);
+    };
+    req.onerror = () => {
+      notificationDbPromise = null;
+      reject(req.error);
+    };
   });
+
+  return notificationDbPromise;
 }
 
 function getFlag(key) {

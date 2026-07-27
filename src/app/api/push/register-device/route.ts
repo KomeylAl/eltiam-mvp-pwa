@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { serverFetch } from "@/lib/serverFetch";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function POST(req: NextRequest) {
   const authToken = req.cookies.get("token")?.value;
@@ -7,7 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthenticated." }, { status: 401 });
   }
 
-  const pulseApiUrl = process.env.PULSE_API_URL;
+  const pulseApiUrl = process.env.PULSE_API_URL?.replace(/\/$/, "");
   const pulseApiKey = process.env.PULSE_API_KEY;
 
   if (!pulseApiUrl || !pulseApiKey) {
@@ -20,7 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const response = await fetch(`${pulseApiUrl}/push/device-tokens`, {
+    const response = await serverFetch(`${pulseApiUrl}/push/device-tokens`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +34,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(body),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const data = await response.json<{ message?: string }>().catch(() => ({}));
 
     if (!response.ok) {
       return NextResponse.json(

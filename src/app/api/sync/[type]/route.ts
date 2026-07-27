@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl, serverFetch } from "@/lib/serverFetch";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 const SYNC_ENDPOINTS: Record<string, string> = {
   measurements: "/measurements/sync",
@@ -27,7 +31,7 @@ export async function POST(
   try {
     const body = await req.json();
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
+    const response = await serverFetch(`${getBackendUrl()}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,6 +39,7 @@ export async function POST(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
+      timeoutMs: 30_000,
     });
 
     const data = await response.json();

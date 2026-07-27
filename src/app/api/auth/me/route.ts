@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl, serverFetch } from "@/lib/serverFetch";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
@@ -8,7 +12,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/me`, {
+    const response = await serverFetch(`${getBackendUrl()}/auth/me`, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -22,7 +26,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json<{ data: unknown }>();
     return NextResponse.json(data.data);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";

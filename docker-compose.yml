@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-https://eltiamcare.ir/api}
         BACKEND_URL: ${BACKEND_URL:-https://eltiamcare.ir/api}
         PULSE_API_URL: ${PULSE_API_URL}
         NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
@@ -21,5 +22,11 @@ services:
       NODE_ENV: production
       PORT: 8002
       HOSTNAME: 0.0.0.0
+      # Cap V8 heap so a leak fails fast instead of eating the host
+      NODE_OPTIONS: "--max-old-space-size=768"
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-https://eltiamcare.ir/api}
       BACKEND_URL: ${BACKEND_URL:-https://eltiamcare.ir/api}
       PULSE_API_URL: ${PULSE_API_URL}
+      PULSE_API_KEY: ${PULSE_API_KEY}
+    mem_limit: 1g
+    cpus: "1.0"

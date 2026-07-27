@@ -20,17 +20,36 @@ type NotificationFlag = {
   notified?: boolean;
 };
 
+let notificationDbPromise: Promise<IDBDatabase> | null = null;
+
 function openNotificationDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  if (notificationDbPromise) return notificationDbPromise;
+
+  notificationDbPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(NOTIFICATION_DB, 1);
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(NOTIFICATION_STORE)) {
         req.result.createObjectStore(NOTIFICATION_STORE);
       }
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onsuccess = () => {
+      const dbConn = req.result;
+      dbConn.onclose = () => {
+        notificationDbPromise = null;
+      };
+      dbConn.onversionchange = () => {
+        dbConn.close();
+        notificationDbPromise = null;
+      };
+      resolve(dbConn);
+    };
+    req.onerror = () => {
+      notificationDbPromise = null;
+      reject(req.error);
+    };
   });
+
+  return notificationDbPromise;
 }
 
 async function getFlag(key: string): Promise<NotificationFlag | null> {
@@ -95,7 +114,6 @@ async function isSlotCompleted(
   date: string
 ): Promise<boolean> {
   const table = formType === "measurement" ? "measurements" : "interventions";
-  // @ts-expect-error dynamic table
   const records: { date: string; time: string; q_number: number }[] = await db[
     table
   ]

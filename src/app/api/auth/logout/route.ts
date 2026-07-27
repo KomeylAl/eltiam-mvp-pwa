@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBackendUrl, serverFetch } from "@/lib/serverFetch";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
 
     if (token) {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      try {
+        await serverFetch(`${getBackendUrl()}/auth/logout`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          timeoutMs: 5_000,
+        });
+      } catch {
+        // Still clear the cookie even if upstream logout fails/times out.
+      }
     }
 
     const res = NextResponse.json({ message: "Logged out successfully." });
